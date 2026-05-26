@@ -1,0 +1,3 @@
+﻿  StudentStack.cpp
+C:\Users\USER\Documents\data2\Complex.a\Lec04_Class_Example\StudentStack\StudentStack.cpp(4,1): warning C4326: 'main'의 반환 형식이 'int'이어야 하는데 'void'입니다.
+  StudentStack.vcxproj -> C:\Users\USER\Documents\data2\Complex.a\Lec04_Class_Example\x64\Debug\StudentStack.exe
