@@ -78,21 +78,112 @@ public:
 		return (getEdge(i, j) < INF);
 	}
 
-	void load(char* filename) {
-		FILE* fp = fopen(filename, "r");
+	void load(const char* filename) {
+		FILE* fp;
+		fopen_s(&fp, filename, "r");
 		if (fp != NULL) {
 			int n, val;
-			fscanf(fp, "%d", &n);
+			fscanf_s(fp, "%d", &n);
 			for (int i = 0; i < n; i++) {
 				char str[80];
-				fscanf(fp, "%s", str);
+				int val;
+				fscanf_s(fp, "%s", str, sizeof(str));
 				insertVertex(str[0]);
 				for (int j = 0; j < n; j++) {
-					fscanf(fp, "%d", &val);
+					fscanf_s(fp, "%d", &val);
 					insertEdge(i, j, val);
 				}
 			}
 			fclose(fp);
+		}
+	}
+};
+
+// [여기에 아래 코드들을 이어서 붙이세요]
+
+// 1. HeapNode
+struct HeapNode {
+	int key, u, v;
+	int getKey() { return key; }
+	int getV1() { return u; }
+	int getV2() { return v; }
+	void setKey(int k, int uu, int vv) { key = k; u = uu; v = vv; }
+};
+
+// 2. MinHeap
+class MinHeap {
+	HeapNode node[100];
+	int size = 0;
+public:
+	MinHeap() { size = 0; }
+	bool isEmpty() { return size == 0; }
+	bool isFull() { return size >= 99; }
+	HeapNode& getParent(int i) { return node[i / 2]; }
+
+	void insert(int key, int u, int v) {
+		if (isFull()) return;
+		int i = ++size;
+		while (i != 1 && key < getParent(i).getKey()) {
+			node[i] = getParent(i);
+			i /= 2;
+		}
+		node[i].setKey(key, u, v);
+	}
+
+	HeapNode remove() {
+		HeapNode root = node[1];
+		HeapNode last = node[size--];
+		int i = 1, child = 2;
+		while (child <= size) {
+			if (child < size && node[child + 1].getKey() < node[child].getKey()) child++;
+			if (last.getKey() <= node[child].getKey()) break;
+			node[i] = node[child];
+			i = child;
+			child *= 2;
+		}
+		node[i] = last;
+		return root;
+	}
+};
+
+// 3. VertexSets (Union-Find)
+class VertexSets {
+	int parent[MAX_VTXS];
+public:
+	VertexSets(int n) {
+		for (int i = 0; i < n; i++) parent[i] = -1;
+	}
+	int findSet(int i) {
+		while (parent[i] >= 0) i = parent[i];
+		return i;
+	}
+	void unionSets(int i, int j) {
+		parent[i] = j;
+	}
+};
+
+// 4. WGraphMST
+class WGraphMST : public WGraph {
+public:
+	void Kruskal() {
+		MinHeap heap;
+		for (int i = 0; i < size - 1; i++)
+			for (int j = i + 1; j < size; j++)
+				if (hasEdge(i, j))
+					heap.insert(getEdge(i, j), i, j);
+
+		VertexSets set(size);
+		int edgeAccepted = 0;
+		while (edgeAccepted < size - 1 && !heap.isEmpty()) {
+			HeapNode e = heap.remove();
+			int uset = set.findSet(e.getV1());
+			int vset = set.findSet(e.getV2());
+			if (uset != vset) {
+				printf("간선 추가 : %c - %c (비용:%d)\n",
+					getVertex(e.getV1()), getVertex(e.getV2()), e.getKey());
+				set.unionSets(uset, vset);
+				edgeAccepted++;
+			}
 		}
 	}
 };

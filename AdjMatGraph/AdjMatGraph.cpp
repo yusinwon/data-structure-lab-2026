@@ -27,5 +27,13 @@ int main()
     g.resetVisited();  
     g.DFS(0);         
     printf("\n");
+    printf("\nDFS  ==> ");
+    g.resetVisited();
+    g.DFS(0);
+    printf("\n");
+    printf("\n--- Kruskal MST °á°ú ---\n");
+    WGraphMST mst;
+    mst.load("graph.txt");
+    mst.Kruskal();
     return 0;
 }
