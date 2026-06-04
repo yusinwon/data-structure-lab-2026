@@ -35,5 +35,9 @@ int main()
     WGraphMST mst;
     mst.load("graph.txt");
     mst.Kruskal();
+    printf("\n--- Dijkstra 최단 경로 결과 ---\n");
+    WGraphDijkstra d;
+    d.load("graph_sp.txt"); 
+    d.ShortestPath(0);
     return 0;
 }
